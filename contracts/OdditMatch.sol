@@ -3,7 +3,6 @@ pragma solidity ^0.8.17;
 
 import "./openzeppelin/SafeMath.sol";
 import "./openzeppelin/IERC20.sol";
-import "hardhat/console.sol";
 
 interface IMASTER {
     function appendOrder(address _user, uint _id, address _match) external;
