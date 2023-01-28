@@ -1,34 +1,38 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
+const { time, loadFixture } = require("@nomicfoundation/hardhat-network-helpers");
+const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
+const { expect } = require("chai");
+const { Contract } = require("ethers");
+const ethernal = require('hardhat-ethernal');
 
 async function main() {
-    const [owner, signer1] = await ethers.getSigners();
+  // Deploy dai
+  const DAI = await ethers.getContractFactory("DaiToken");
+  const dai = await DAI.deploy();
+  await dai.deployed();
+  console.log("Deploy dai : " + dai.address);
 
-    // Deploy Token
-    const TemplateToken = await ethers.getContractFactory("TemplateToken");
-    const templateToken = await TemplateToken.deploy();
+  // Deploy odditMaster
+  const OdditMaster = await ethers.getContractFactory("OdditMaster");
+  const odditMaster = await OdditMaster.deploy();
+  await odditMaster.deployed();
+  console.log("Deploy odditMaster : " + odditMaster.address);
 
-    // Deploy Master
-    const TemplateMaster = await ethers.getContractFactory("TemplateMaster");
-    const templateMaster = await TemplateMaster.deploy();
+  // Set the first currency (DAI)
+  await odditMaster.addCurrency(0, "DAI", dai.address);
 
-    // Set Master address
-    await templateToken.setMaster(templateMaster.address);
+  // Set fees
+  await odditMaster.setFees(2500);
 
-    // Set Token address
-    await templateMaster.setToken(templateToken.address);
-
-    // Set fees to 2.5%
-    await templateMaster.setFees(2500);
+  // Create odditMatch
+  const OdditMatch = await ethers.getContractFactory("OdditMatch");
+  const odditMatch = await OdditMatch.deploy();
+  await odditMatch.deployed();
+  console.log("Deploy odditMatch : " + odditMatch.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
+  console.error(error);
+  process.exitCode = 1;
 });
