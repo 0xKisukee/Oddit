@@ -23,11 +23,25 @@ async function main() {
   // Set fees
   await odditMaster.setFees(2500);
 
-  // Create odditMatch
-  const OdditMatch = await ethers.getContractFactory("OdditMatch");
-  const odditMatch = await OdditMatch.deploy();
-  await odditMatch.deployed();
-  console.log("Deploy odditMatch : " + odditMatch.address);
+  // Create odditMatch (FRA - MAR)
+  const OdditMatch_1 = await ethers.getContractFactory("OdditMatch");
+  const odditMatch_1 = await OdditMatch_1.deploy(odditMaster.address, "FRA - MAR", 0);
+  await odditMatch_1.deployed();
+  console.log("Deploy odditMatch 1 : " + odditMatch_1.address);
+
+  // Synchronize artifacts
+  await hre.ethernal.push({
+    name: 'DaiToken',
+    address: dai.address
+  });
+  await hre.ethernal.push({
+    name: 'OdditMaster',
+    address: odditMaster.address
+  });
+  await hre.ethernal.push({
+    name: 'OdditMatch',
+    address: odditMatch_1.address
+  });
 }
 
 // We recommend this pattern to be able to use async/await everywhere
